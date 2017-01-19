@@ -1,0 +1,198 @@
+<hr>
+<button type="button" name="button" onclick="sendItOver()">Send shit</button>
+<hr>
+<script type="text/javascript">
+  var datas = "number is: 5";
+  function sendItOver() {
+    $.ajax({
+      url: "/clients/datos",
+      type: 'get',
+      data: {name: datas}
+    })
+    .success(function(ret){
+
+      var shit = '<%= @dat %>';
+      console.log(ret);
+      console.log(shit);
+    });
+  }
+
+</script>
+
+<hr>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="">
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $("#mybut").click(function(){
+        navigator.geolocation.getCurrentPosition(userPosition);
+        function userPosition(position) {
+          var lat = position.coords.latitude;
+          var long = position.coords.longitude;
+          var h2Id = document.getElementById('myloc');
+          h2Id.append(lat + " " + long);
+          };
+      });
+    });
+  </script>
+
+  <br>
+  <h2 id="myloc"></h2>
+  <button id="mybut" type="button" name="button">My location</button>
+</div>
+
+<div id="map" style="width:500px;height:400px"></div>
+
+<script type="text/javascript">
+  function myMap(){
+    navigator.geolocation.getCurrentPosition(localPosition);
+    function localPosition(pos) {
+      var latitude = pos.coords.latitude;
+      var longitude = pos.coords.longitude;
+      var mapDiv = document.getElementById('map');
+      var mypos = {lat: latitude, lng: longitude};
+      var map = new google.maps.Map(mapDiv,  {zoom: 14, center: mypos});
+      var marker = new google.maps.Marker({position: mypos, map: map});
+      // var marker = new google.maps.Marker({position: mypos, map: map});
+  };
+}
+</script>
+
+<div>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+
+    // userLocation();
+    google.charts.load('current', {'packages':['gauge']});
+    // google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart(temp) {
+      var data = google.visualization.arrayToDataTable([
+        ['Label', 'Value'],
+        ['Temperature', temp]
+      ]);
+
+      var options = {
+        width: 400, height: 120,
+        redFrom: 90, redTo: 100,
+        yellowFrom:75, yellowTo: 90,
+        greenFrom:50, greenTo: 75,
+        minorTicks: 5
+      };
+
+      var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    };
+
+  // get weather data
+    function getWeather(location) {
+      var cityCountry = ("q=" + location.city + "," + location.country_code);
+      var url = 'http://api.openweathermap.org/data/2.5/weather?';
+      var key = '&APPID=bf341b8e706bb0785122815e31319440';
+
+      $.ajax({
+        url: url + cityCountry + key,
+        method: "get",
+        type: "json"
+      })
+      .success(function(weather){
+        var tempF = Math.round((weather.main.temp * (9 / 5)) - 459.67);
+        drawChart(tempF);
+      });
+    };
+
+  // get user location
+    function userLocation(){
+      $.ajax({
+        url: "http://freegeoip.net/json/",
+        method: "get",
+        type: "json"})
+        .success(function(info){
+          getWeather(info);
+        });
+
+      // $.get("http://freegeoip.net/json/", function(data){
+      //   getWeather(data);
+      // })
+    }
+
+  </script>
+  <br>
+  <br>
+  <br>
+<button type="button" name="button" onclick="userLocation()">Press for Local Weather Gauge</button>
+<div id="chart_div" style="width: 400px; height: 120px;"></div>
+
+</div>
+<br>
+<br>
+<br>
+ <%= @myArr %>
+<div class="charts" id="charts" style="max-width: 60%;">
+  <%= line_chart Client.group(:age).count %>
+</div>
+<br>
+<br>
+<br>
+
+</div>
+<div id="charts">
+
+<table class="table table-striped" >
+<thead>
+  <th>Id</th>
+  <th>Name</th>
+  <th>Age</th>
+</thead>
+<tbody class="clientbody">
+      <%= render 'client'%>
+</tbody>
+
+</table>
+</div>
+<div id="paginator">
+  <%= render 'paginator' %>
+</div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnajQVm7A0BZ6mRTRM8d81zW_-MaquM7Y&callback=myMap"></script>
+<!-- <script>
+    (function(){
+        reloadLocation = function(position){
+            var lt = position.coords.latitude;
+            var lg = position.coords.longitude;
+            var action = '/?lt=' + lt + '&lg=' + lg;
+
+            ajaxPOST(action);
+        };
+
+        fallBackLocation = function(){
+          $.get("http://ipinfo.io/json", function(response) {
+              var loc    = response.loc.split(",");
+              var lt     = loc[0];
+              var lg     = loc[1];
+              var action = '/?lt=' + lt + '&lg=' + lg;
+
+              ajaxPOST(action);
+          });
+        }
+
+        ajaxPOST =  function(action){
+            $.ajax({
+                method   : "GET",
+                url      : action,
+                dataType : "html",
+                success  : function(response){
+                            document.write(response);
+                            document.close();
+                          }
+            });
+        };
+
+        navigator.geolocation.getCurrentPosition(reloadLocation, fallBackLocation);
+    })();
+  </script> -->
